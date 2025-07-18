@@ -1,4 +1,8 @@
 ---
+import "../styles/global.css"; 
+import { Image } from "astro:assets";
+import { ClientRouter } from "astro:transitions";
+
 interface Props {
   title: string;
 }
@@ -18,9 +22,37 @@ const { title } = Astro.props;
     <meta name="viewport" content="width=device-width" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="generator" content={Astro.generator} />
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap" rel="stylesheet">
+
     <title>{title}</title>
+    <ClientRouter />
   </head>
-  <body class="bg-white">
-    <slot />
+  <body class="bg-[#FAF9F6] text-[#333333]">
+    <div class="max-w-5xl mx-auto flex gap-10 py-10 md:py-20 px-4">
+      <header class="flex flex-col gap-4 sticky top-0 max-w-xs">
+        <a href="/">
+          <Image src="/images/lewismorris.jpg" alt="Lewis Morris" width={320} height={320} class="rounded-2xl w-full h-full object-cover aspect-square" />
+        </a>
+        <div>
+          <h1 class="text-2xl font-black tracking-">Lewis Morris</h1>
+          <p class="text-sm text-gray-500">Software Engineer, Community Builder, Web Maker</p>
+        </div>
+        <nav class="flex flex-col gap-4">
+          <a
+            class="block uppercase font-bold py-2 px-4 text-whit"
+            href="/">
+            PROJECTS
+          </a>
+          <a href="/about">BLOG</a>
+          <a href="/contact">CONTACT</a>
+        </nav>
+      </header>
+      <div class="flex-1" transition:animate="slide">
+        <slot />
+      </div>
+    </div>
   </body>
 </html>
