@@ -18,6 +18,7 @@ import Layout from "../layouts/Layout.astro";
           <a href="https://getkitted.co" class="underline hover:text-white/80"
             >KITTED</a
           >.
+        </p>
         <a
           href="mailto:lewis@lewismorris.co.uk"
           class="flex w-auto gap-2 rounded-md bg-white px-4 py-2 font-mono text-gray-900 transition ease-linear hover:bg-white/80"
@@ -39,11 +40,13 @@ import Layout from "../layouts/Layout.astro";
         </a>
       </div>
       <Image
-        src="/images/lewismorris.jpg"
+        src="/images/me.jpg"
+        format="avif"
         alt="Lewis Morris - Consultant Front End Engineer"
         width="380"
         height="380"
-        class="rounded-lg"
+        class="aspect-square rounded-lg object-cover"
+        loading="eager"
       />
     </div>
     <div class="flex justify-center gap-4">
