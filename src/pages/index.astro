@@ -1,5 +1,5 @@
 ---
-import { Image } from "astro:assets";
+import { Image, Picture } from "astro:assets";
 import Layout from "../layouts/Layout.astro";
 ---
 
@@ -39,9 +39,9 @@ import Layout from "../layouts/Layout.astro";
           </svg>
         </a>
       </div>
-      <Image
+      <Picture
         src="/images/me.jpg"
-        format="avif"
+        formats={["avif", "webp", "jpeg"]}
         alt="Lewis Morris - Consultant Front End Engineer"
         width="380"
         height="380"
