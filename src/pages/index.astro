@@ -1,6 +1,8 @@
 ---
-import { Image, Picture } from "astro:assets";
+import { Picture } from "astro:assets";
 import Layout from "../layouts/Layout.astro";
+import me from "../assets/images/me.jpg";
+
 ---
 
 <Layout title="Lewis Morris - Consultant Front End Engineer">
@@ -40,13 +42,14 @@ import Layout from "../layouts/Layout.astro";
         </a>
       </div>
       <Picture
-        src="/images/me.jpg"
-        formats={["avif", "webp", "jpeg"]}
+        src={me}
+        formats={["avif", "webp"]}
         alt="Lewis Morris - Consultant Front End Engineer"
-        width="380"
-        height="380"
+        width={380}
+        height={380}
         class="aspect-square rounded-lg object-cover"
         loading="eager"
+        quality={100}
       />
     </div>
     <div class="flex justify-center gap-4">
