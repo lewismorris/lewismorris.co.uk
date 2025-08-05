@@ -1,0 +1,21 @@
+---
+import Layout from "./Layout.astro";
+import Prose from "../components/Prose.astro";
+
+interface Props {
+  frontmatter: {
+    title: string;
+  };
+}
+
+const { frontmatter } = Astro.props;
+---
+
+<Layout title={frontmatter.title}>
+  <main class="w-full max-w-4xl mx-auto">
+    <a href="/" class="text-white block mb-4">&larr; Back</a>
+    <Prose>
+      <slot />
+    </Prose>
+  </main>
+</Layout>
