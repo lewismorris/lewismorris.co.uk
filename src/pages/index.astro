@@ -3,6 +3,13 @@ import { Picture } from "astro:assets";
 import Layout from "../layouts/Layout.astro";
 import me from "../assets/images/me.jpg";
 
+// Get all blog posts
+const posts = await Astro.glob('./blog/*.md');
+const sortedPosts = posts.sort((a, b) => {
+  const dateA = new Date(a.frontmatter.date);
+  const dateB = new Date(b.frontmatter.date);
+  return dateB.getTime() - dateA.getTime();
+});
 ---
 
 <Layout title="Lewis Morris - Product-Focused Front End Engineer">
@@ -24,13 +31,38 @@ import me from "../assets/images/me.jpg";
       />
       <div class="flex flex-col items-start gap-2">
         <h1 class="text-xl font-medium text-white">Hi, I'm Lewis Morris</h1>
-        <p class="leading-relaxed text-sm text-white">A product-focused Front End Engineer with 15 years of experience helping teams ship fast, accessible, and maintainable web applications.</p>
+        <p class="leading-relaxed text-sm text-white">A coder, builder, maker, with 15 years of experience helping teams ship fast, accessible, and maintainable web applications.</p>
       </div>
     </section>
 
     <hr class="w-full border-white/20" />
 
     <section class="flex flex-col gap-4 w-full">
+      <h2 class="text-lg font-medium text-white">Writing</h2>
+      <div class="flex flex-col gap-3">
+        {sortedPosts.map((post) => {
+          const formattedDate = new Date(post.frontmatter.date).toLocaleDateString('en-GB', {
+            year: 'numeric',
+            month: 'short',
+            day: 'numeric'
+          });
+          return (
+            <a 
+              href={post.url} 
+              class="flex flex-col gap-1 p-3 border border-white/20 rounded-md bg-white/5 hover:bg-white/10 transition-colors"
+            >
+              <h3 class="text-sm font-medium text-white">{post.frontmatter.title}</h3>
+              <time datetime={post.frontmatter.date} class="text-xs text-white/60">{formattedDate}</time>
+              {post.frontmatter.description && (
+                <p class="text-sm text-white/80 leading-relaxed">{post.frontmatter.description}</p>
+              )}
+            </a>
+          );
+        })}
+      </div>
+    </section>
+    
+    <!-- <section class="flex flex-col gap-4 w-full">
       <h2 class="text-lg font-medium text-white">
         Building
       </h2>
@@ -70,10 +102,10 @@ import me from "../assets/images/me.jpg";
           </tr>
         </tbody>
       </table>
-    </section>
+    </section> -->
     
-    <hr class="w-full border-white/20" />
-
+    <!-- <hr class="w-full border-white/20" /> -->
+<!-- 
     <section class="flex flex-col gap-4 w-full">
       <h2 class="text-lg font-medium text-white">Work With Me</h2>
       <p class="text-sm text-white">I partner with startups and product teams to build fast, accessible, and maintainable front-end applications. Whether you need someone to lead delivery, scale an existing codebase, or bring consistency to your UI, I can integrate quickly and work with minimal oversight.</p>
@@ -85,11 +117,11 @@ import me from "../assets/images/me.jpg";
 
     <nav class="flex flex-row gap-4">
       <a href="/curriculum-vitae" class="text-sm text-white/80 hover:text-white">Curriculum Vitae</a>
-    </nav>
+    </nav> -->
 
     <hr class="w-full border-white/20" />
 
-    <div class="flex justify-center gap-4">
+    <div class="flex justify-center flex-wrap gap-4">
       <a
         href="https://x.com/lewimorris"
         target="_blank"
@@ -147,6 +179,14 @@ import me from "../assets/images/me.jpg";
           ></path></svg
         >
         lewisjamesmorris
+      </a>
+      <a
+        href="mailto:lewis@lewismorris.co.uk?subject=I want to work with you"
+        title="Work with me"
+        class="flex flex-row items-center gap-2 border border-white/20 rounded-md px-2 py-1 bg-white/10 text-sm hover:bg-white/20"
+      >
+        <svg viewBox="0 0 24 24" class="h-3 w-3 text-white" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><title>Email</title><path d="M24 5.457v13.909H0V5.457L12 18 24 5.457z"></path></svg>
+        Work with me
       </a>
     </div>
   </main>
