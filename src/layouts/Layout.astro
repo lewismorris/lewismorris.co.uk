@@ -17,9 +17,11 @@ const { title } = Astro.props;
     <meta charset="UTF-8" />
     <meta
       name="description"
-      content="Coder. Builder. Maker. Helping teams ship fast, accessible, and maintainable web apps."
+      content="Coder. Builder. Maker. Helping teams ship fast, accessible and maintainable web apps."
     />
     <meta name="viewport" content="width=device-width" />
+    <meta name="og:title" content={`${title} | Lewis Morris`} />
+    <meta name="og:description" content="Coder. Builder. Maker. Helping teams ship fast, accessible and maintainable web apps." />
     <meta property="og:image" content="/og-image.png" />
     <link rel="icon" type="image/x-icon" href="/favicon.ico" />
     <link rel="icon" type="image/png" href="/favicon-16x16.png" sizes="16x16" />
@@ -48,7 +50,7 @@ const { title } = Astro.props;
       />
       <div class="flex flex-col items-start gap-2">
         <h1 class="text-xl font-medium text-white">Hi, I'm Lewis Morris</h1>
-        <p class="leading-relaxed text-sm text-white">Coder. Builder. Maker. Helping teams ship fast, accessible, and maintainable web apps.</p>
+        <p class="leading-relaxed text-sm text-white">Coder. Builder. Maker. Helping teams ship fast, accessible and maintainable web apps.</p>
       </div>
     </header>
     <slot />
