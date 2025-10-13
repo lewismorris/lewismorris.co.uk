@@ -1,5 +1,9 @@
 ---
 import '../styles/global.css';
+import { Picture } from "astro:assets";
+import me from "../assets/images/me.jpg";
+import { ClientRouter } from "astro:transitions";
+
 interface Props {
   title: string;
 }
@@ -13,9 +17,10 @@ const { title } = Astro.props;
     <meta charset="UTF-8" />
     <meta
       name="description"
-      content="Product-focused Front End Engineer with 15 years of experience helping teams ship fast, accessible, and maintainable web applications"
+      content="Coder. Builder. Maker. Helping teams ship fast, accessible, and maintainable web apps."
     />
     <meta name="viewport" content="width=device-width" />
+    <meta property="og:image" content="/og-image.png" />
     <link rel="icon" type="image/x-icon" href="/favicon.ico" />
     <link rel="icon" type="image/png" href="/favicon-16x16.png" sizes="16x16" />
     <link rel="icon" type="image/png" href="/favicon-32x32.png" sizes="32x32" />
@@ -23,9 +28,29 @@ const { title } = Astro.props;
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
     <meta name="generator" content={Astro.generator} />
-    <title>{title}</title>
+    <title>{title} | Lewis Morris</title>
+
+    <ClientRouter />
   </head>
   <body>
+    <header
+      class="flex flex-row w-full items-center justify-center gap-8 max-w-2xl mx-auto pb-8 border-b border-white/20 mb-4"
+    >
+      <Picture
+        src={me}
+        formats={["avif", "webp"]}
+        alt="Lewis Morris - Product-Focused Front End Engineer"
+        width={256}
+        height={256}
+        class="aspect-square rounded-lg object-cover"
+        loading="eager"
+        quality={100}
+      />
+      <div class="flex flex-col items-start gap-2">
+        <h1 class="text-xl font-medium text-white">Hi, I'm Lewis Morris</h1>
+        <p class="leading-relaxed text-sm text-white">Coder. Builder. Maker. Helping teams ship fast, accessible, and maintainable web apps.</p>
+      </div>
+    </header>
     <slot />
   </body>
 </html>
