@@ -20,7 +20,7 @@ const formattedDate = new Date(frontmatter.date).toLocaleDateString('en-GB', {
 });
 ---
 
-<Layout title={`${frontmatter.title} - Lewis Morris`}>
+<Layout title={frontmatter.title}>
   <main class="w-full max-w-2xl mx-auto">
     <article class="space-y-4">
       <header>
