@@ -1,5 +1,7 @@
 ---
 import '../styles/global.css';
+import { ClientRouter } from "astro:transitions";
+
 interface Props {
   title: string;
 }
@@ -13,9 +15,12 @@ const { title } = Astro.props;
     <meta charset="UTF-8" />
     <meta
       name="description"
-      content="Product-focused Front End Engineer with 15 years of experience helping teams ship fast, accessible, and maintainable web applications"
+      content="Coder. Builder. Maker. Helping teams ship fast, accessible and maintainable web apps."
     />
     <meta name="viewport" content="width=device-width" />
+    <meta name="og:title" content={`${title} | Lewis Morris`} />
+    <meta name="og:description" content="Coder. Builder. Maker. Helping teams ship fast, accessible and maintainable web apps." />
+    <meta property="og:image" content="/og-image.png" />
     <link rel="icon" type="image/x-icon" href="/favicon.ico" />
     <link rel="icon" type="image/png" href="/favicon-16x16.png" sizes="16x16" />
     <link rel="icon" type="image/png" href="/favicon-32x32.png" sizes="32x32" />
@@ -23,7 +28,9 @@ const { title } = Astro.props;
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
     <meta name="generator" content={Astro.generator} />
-    <title>{title}</title>
+    <title>{title} | Lewis Morris</title>
+
+    <ClientRouter />
   </head>
   <body class="font-serif antialiased">
     <slot />
