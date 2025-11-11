@@ -1,10 +1,7 @@
 ---
-import { Picture } from "astro:assets";
 import Layout from "../layouts/Layout.astro";
-import me from "../assets/images/me.jpg";
-
-// Get all blog posts
-const posts = await Astro.glob('./blog/*.md');
+import { differenceInYears } from 'date-fns';
+const posts = await Astro.glob('./writing/*.md');
 const sortedPosts = posts.sort((a, b) => {
   const dateA = new Date(a.frontmatter.date);
   const dateB = new Date(b.frontmatter.date);
@@ -12,182 +9,34 @@ const sortedPosts = posts.sort((a, b) => {
 });
 ---
 
-<Layout title="Lewis Morris - Product-Focused Front End Engineer">
+<Layout title="Lewis Morris">
   <main
-    class="flex flex-col max-w-2xl w-full mx-auto items-center gap-8"
+    class="max-w-2xl w-full mx-auto space-y-8"
   >
-    <section
-      class="flex flex-row w-full items-center justify-center gap-8"
-    >
-      <Picture
-        src={me}
-        formats={["avif", "webp"]}
-        alt="Lewis Morris - Product-Focused Front End Engineer"
-        width={256}
-        height={256}
-        class="aspect-square rounded-lg object-cover"
-        loading="eager"
-        quality={100}
-      />
-      <div class="flex flex-col items-start gap-2">
-        <h1 class="text-xl font-medium text-white">Hi, I'm Lewis Morris</h1>
-        <p class="leading-relaxed text-sm text-white">A coder, builder, maker, with 15 years of experience helping teams ship fast, accessible, and maintainable web applications.</p>
-      </div>
+    <section class="space-y-4">
+      <h1 class="text-3xl font-medium">Lewis Morris</h1>
+      <p>I'm a product engineer who's spent the last {differenceInYears(new Date(), new Date('2011-01-01'))} years building things for the web</p>
+      <p>I've spent my life working on the web. I built websites for friends and family, started online businesses from my bedroom as a teenager, and ran one of the UK's best <a href="https://middlesbroughfe.co.uk">Front End conferences</a> for six years. Now I help companies build products that are fast, accessible and easy to maintain.</p>
     </section>
+   
+    <hr class="w-full border-neutral-200 dark:border-neutral-800" />
 
-    <hr class="w-full border-white/20" />
-
-    <section class="flex flex-col gap-4 w-full">
-      <h2 class="text-lg font-medium text-white">Writing</h2>
-      <div class="flex flex-col gap-3">
+    <section class="space-y-4">
+      <h2 class="text-3xl font-medium">Writing</h2>
+      <ul class="list-disc list-inside">
         {sortedPosts.map((post) => {
-          const formattedDate = new Date(post.frontmatter.date).toLocaleDateString('en-GB', {
-            year: 'numeric',
-            month: 'short',
-            day: 'numeric'
-          });
           return (
-            <a 
-              href={post.url} 
-              class="flex flex-col gap-1 p-3 border border-white/20 rounded-md bg-white/5 hover:bg-white/10 transition-colors"
-            >
-              <h3 class="text-sm font-medium text-white">{post.frontmatter.title}</h3>
-              <time datetime={post.frontmatter.date} class="text-xs text-white/60">{formattedDate}</time>
-              {post.frontmatter.description && (
-                <p class="text-sm text-white/80 leading-relaxed">{post.frontmatter.description}</p>
-              )}
-            </a>
+            <li>
+              <a href={post.url}>{post.frontmatter.title}</a>
+            </li>
           );
         })}
-      </div>
-    </section>
-    
-    <!-- <section class="flex flex-col gap-4 w-full">
-      <h2 class="text-lg font-medium text-white">
-        Building
-      </h2>
-      <table class="w-full table-auto border-collapse">
-        <thead>
-          <tr class="border-b border-white/20">
-            <th class="text-sm font-bold text-left p-2">Project</th>
-            <th class="text-sm font-bold text-left p-2">Started</th>
-            <th class="text-sm font-bold text-left p-2">Description</th>
-            <th class="text-sm font-bold text-left p-2">Status</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td class="text-sm font-medium p-2">guitarHQ</td>
-            <td class="text-sm font-medium p-2">2016</td>
-            <td class="text-sm p-2">Affiliate Site</td>
-            <td class="text-sm p-2"><span class="bg-gray-500 text-white px-2 py-1 rounded-md">ARCHIVED</span></td>
-          </tr>
-          <tr>
-            <td class="text-sm font-medium p-2"><a href="https://middlesbroughfe.co.uk" class="underline hover:text-white/80">Middlesbrough Front End</a></td>
-            <td class="text-sm font-medium p-2">2019</td>
-            <td class="text-sm p-2">Front End Conference and Meetup</td>
-            <td class="text-sm p-2"><span class="bg-gray-500 text-white px-2 py-1 rounded-md">ARCHIVED</span></td>
-          </tr>
-          <tr>
-            <td class="text-sm font-medium p-2">Rottie Nation</td>
-            <td class="text-sm font-medium p-2">2024</td>
-            <td class="text-sm p-2">PoD Clothing Brand</td>
-            <td class="text-sm p-2"><span class="bg-gray-500 text-white px-2 py-1 rounded-md">ARCHIVED</span></td>
-          </tr>
-          <tr>
-            <td class="text-sm font-medium p-2"><a href="https://getkitted.co" class="underline hover:text-white/80">KITTED</a></td>
-            <td class="text-sm font-medium p-2">2024</td>
-            <td class="text-sm p-2">Football shirt collectors platform & marketplace</td>
-            <td class="text-sm p-2"><span class="bg-green-500 text-white px-2 py-1 rounded-md">ACTIVE</span></td>
-          </tr>
-        </tbody>
-      </table>
-    </section> -->
-    
-    <!-- <hr class="w-full border-white/20" /> -->
-<!-- 
-    <section class="flex flex-col gap-4 w-full">
-      <h2 class="text-lg font-medium text-white">Work With Me</h2>
-      <p class="text-sm text-white">I partner with startups and product teams to build fast, accessible, and maintainable front-end applications. Whether you need someone to lead delivery, scale an existing codebase, or bring consistency to your UI, I can integrate quickly and work with minimal oversight.</p>
-      <p class="text-sm text-white">I'm used to collaborating across design, product, and backend teams, and I value clear communication, short feedback loops, and writing code that lasts. I'm available for project-based or rolling monthly work, either embedded or independently.</p>
-      <a href="mailto:lewis@lewismorris.co.uk" class="bg-white/10 self-center text-white px-2 py-1 rounded-md border border-white/20 hover:bg-white/20">Get in touch</a>
+      </ul>
     </section>
 
-    <hr class="w-full border-white/20" />
+    <hr class="w-full border-neutral-200 dark:border-neutral-800" />
 
-    <nav class="flex flex-row gap-4">
-      <a href="/curriculum-vitae" class="text-sm text-white/80 hover:text-white">Curriculum Vitae</a>
-    </nav> -->
-
-    <hr class="w-full border-white/20" />
-
-    <div class="flex justify-center flex-wrap gap-4">
-      <a
-        href="https://x.com/lewimorris"
-        target="_blank"
-        rel="noopener"
-        title="Follow me on X"
-        class="flex flex-row items-center gap-2 border border-white/20 rounded-md px-2 py-1 bg-white/10 text-sm hover:bg-white/20"
-      >
-        <svg
-          viewBox="0 0 24 24"
-          class="h-3 w-3 text-white"
-          fill="currentColor"
-          xmlns="http://www.w3.org/2000/svg"
-          ><title>X</title><path
-            d="M18.901 1.153h3.68l-8.04 9.19L24 22.846h-7.406l-5.8-7.584-6.638 7.584H.474l8.6-9.83L0 1.154h7.594l5.243 6.932ZM17.61 20.644h2.039L6.486 3.24H4.298Z"
-          ></path></svg
-        >
-        @lewimorris
-      </a>
-      <a
-        href="https://bsky.app/profile/lewismorris.co.uk"
-        target="_blank"
-        rel="noopener"
-        title="Follow me on Bluesky"
-        class="flex flex-row items-center gap-2 border border-white/20 rounded-md px-2 py-1 bg-white/10 text-sm hover:bg-white/20"
-      >
-        <svg
-          width="28"
-          height="24"
-          viewBox="0 0 28 24"
-          class="h-3 w-3 text-white"
-          fill="none"
-          xmlns="http://www.w3.org/2000/svg"
-        >
-          <title>Bluesky</title>
-          <path
-            d="M5.89801 1.61263C9.01753 3.95462 12.3727 8.70328 13.6048 11.2514C14.8368 8.70328 18.192 3.95462 21.3116 1.61263C23.5624 -0.0772129 27.2096 -1.38474 27.2096 2.77588C27.2096 3.60678 26.7332 9.75612 26.4537 10.7545C25.4825 14.2253 21.9433 15.1106 18.7951 14.5748C24.2981 15.5114 25.6979 18.6137 22.6746 21.7159C16.9328 27.6078 14.4221 20.2377 13.7787 18.3492C13.6608 18.003 13.6056 17.841 13.6048 17.9787C13.604 17.841 13.5488 18.003 13.4309 18.3492C12.7875 20.2377 10.2767 27.6078 4.53493 21.7159C1.51165 18.6137 2.91151 15.5114 8.41452 14.5748C5.26625 15.1106 1.72711 14.2253 0.755823 10.7545C0.476419 9.75612 0 3.60678 0 2.77588C0 -1.38474 3.64716 -0.0772129 5.89801 1.61263Z"
-            fill="white"></path>
-        </svg>
-        @lewimorris.co.uk
-      </a>
-      <a
-        href="https://www.linkedin.com/in/lewisjamesmorris/"
-        target="_blank"
-        rel="noopener"
-        title="Connect with me on LinkedIn"
-        class="flex flex-row items-center gap-2 border border-white/20 rounded-md px-2 py-1 bg-white/10 text-sm hover:bg-white/20"
-      >
-        <svg
-          viewBox="0 0 24 24"
-          class="h-3 w-3 text-white"
-          fill="currentColor"
-          xmlns="http://www.w3.org/2000/svg"
-          ><title>LinkedIn</title><path
-            d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"
-          ></path></svg
-        >
-        lewisjamesmorris
-      </a>
-      <a
-        href="mailto:lewis@lewismorris.co.uk?subject=I want to work with you"
-        title="Work with me"
-        class="flex flex-row items-center gap-2 border border-white/20 rounded-md px-2 py-1 bg-white/10 text-sm hover:bg-white/20"
-      >
-        <svg viewBox="0 0 24 24" class="h-3 w-3 text-white" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><title>Email</title><path d="M24 5.457v13.909H0V5.457L12 18 24 5.457z"></path></svg>
-        Work with me
-      </a>
-    </div>
+    <p>Find me ranting on <a href="https://x.com/lewismorris" target="_blank" rel="noopener noreferrer">X</a>, building on <a href="https://github.com/lewismorr" target="_blank" rel="noopener noreferrer">GitHub</a>, and being professional on <a href="https://linkedin.com/in/lewismorris" target="_blank" rel="noopener noreferrer">LinkedIn</a>. If you want to work together or chat about something I've built, drop me a message <a href="mailto:lewis@lewismorris.co.uk?subject=Hello!">here</a>.</p>
   </main>
 </Layout>
+

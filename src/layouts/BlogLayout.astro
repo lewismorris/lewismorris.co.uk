@@ -20,15 +20,14 @@ const formattedDate = new Date(frontmatter.date).toLocaleDateString('en-GB', {
 });
 ---
 
-<Layout title={`${frontmatter.title} | Lewis Morris`}>
+<Layout title={`${frontmatter.title} - Lewis Morris`}>
   <main class="w-full max-w-2xl mx-auto">
-    <a href="/" class="text-white/80 hover:text-white block mb-8 text-sm">&larr; Back to home</a>
-    <article class="flex flex-col gap-4">
-      <header class="flex flex-col gap-2">
-        <h1 class="text-2xl font-medium text-white">{frontmatter.title}</h1>
-        <time datetime={frontmatter.date} class="text-sm text-white/60">{formattedDate}</time>
+    <article class="space-y-4">
+      <header>
+        <h1 class="text-3xl font-medium">{frontmatter.title}</h1>
+        <time datetime={frontmatter.date}>{formattedDate}</time>
       </header>
-      <hr class="w-full border-white/20" />
+      <hr class="w-full border-neutral-200 dark:border-neutral-800" />
       <Prose>
         <slot />
       </Prose>

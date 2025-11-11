@@ -1,7 +1,13 @@
 @import "tailwindcss";
-@plugin '@tailwindcss/typography';
 
 body {
-  @apply bg-gray-900 p-8 text-white;
-  font-family: 'Inter', sans-serif;
+  @apply bg-neutral-50 px-6 py-12 md:px-12 md:py-24 text-neutral-900 font-serif antialiased dark:bg-neutral-900 dark:text-neutral-50 text-lg;
+}
+
+a {
+  @apply underline-offset-4 hover:opacity-80 underline;
+}
+
+p { 
+  @apply leading-relaxed;
 }
