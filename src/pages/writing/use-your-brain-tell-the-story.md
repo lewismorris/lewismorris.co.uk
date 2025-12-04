@@ -2,7 +2,7 @@
 layout: ../../layouts/BlogLayout.astro
 title: "Use Your Brain. Tell The Story"
 date: "2025-12-04"
-description: "A personal look at remote work, why culture matters more than office presence and how the post-2020 shift has already started to slip backwards."
+description: "A reflection on creativity, photography and storytelling in a world shaped by AI, and why using your brain still matters more than ever."
 ---
 I’ve been trying to get back into photography over the past year, and when I say “back into” I mean actually using a camera (that isn’t my iPhone) in a mode other than auto.
 
