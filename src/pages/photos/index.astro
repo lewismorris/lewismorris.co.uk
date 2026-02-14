@@ -1,0 +1,75 @@
+---
+import { getCollection } from 'astro:content';
+import { Image } from 'astro:assets';
+import Layout from '../../layouts/Layout.astro';
+
+async function safeGetPhotosCollection() {
+  try {
+    return await getCollection('photos');
+  } catch {
+    return [];
+  }
+}
+
+const albums = await safeGetPhotosCollection();
+const visibleAlbums = albums.filter((album) => !album.data.hidden);
+const sortedAlbums = visibleAlbums.sort((a, b) => b.data.date.getTime() - a.data.date.getTime());
+
+const sidecarModules = import.meta.glob('../../content/photos-data/*.json', { eager: true });
+const sidecars = Object.fromEntries(
+  Object.entries(sidecarModules).map(([filePath, mod]) => {
+    const slug = filePath.split('/').pop()?.replace(/\.json$/, '') ?? '';
+    return [slug, mod as { default?: { photos?: unknown[] }; photos?: unknown[] }];
+  })
+);
+
+function photoCountForAlbum(slug: string) {
+  const sidecar = sidecars[slug];
+  const payload = sidecar?.default ?? sidecar;
+  return Array.isArray(payload?.photos) ? payload.photos.length : 0;
+}
+---
+
+<Layout title="Photos">
+  <main class="max-w-5xl mx-auto space-y-8">
+    <header class="space-y-3">
+      <a href="/" class="inline-block">&larr; Back</a>
+      <h1 class="text-4xl font-medium">Photos</h1>
+    </header>
+    {
+      sortedAlbums.length === 0 ? (
+        <p>No albums yet.</p>
+      ) : (
+        <ul class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          {sortedAlbums.map((album) => (
+            <li>
+              <a
+                href={`/photos/${album.slug}`}
+                class="block rounded-xl border border-neutral-200 dark:border-neutral-800 overflow-hidden no-underline"
+              >
+                <Image
+                  src={album.data.cover}
+                  alt={album.data.title}
+                  widths={[480, 720, 960]}
+                  sizes="(min-width: 1024px) 30vw, (min-width: 640px) 45vw, 100vw"
+                  class="w-full h-64 object-cover"
+                  loading="lazy"
+                  fetchpriority="low"
+                />
+                <div class="p-4 space-y-1">
+                  <h2 class="text-2xl font-medium">{album.data.title}</h2>
+                  {album.data.description && (
+                    <p class="text-sm text-neutral-700 dark:text-neutral-300">{album.data.description}</p>
+                  )}
+                  <p class="text-sm text-neutral-600 dark:text-neutral-400">
+                    {photoCountForAlbum(album.slug)} photos
+                  </p>
+                </div>
+              </a>
+            </li>
+          ))}
+        </ul>
+      )
+    }
+  </main>
+</Layout>

@@ -5,6 +5,9 @@
   "scripts": {
     "dev": "astro dev",
     "start": "astro dev",
+    "photos:sync": "node scripts/photos-sync-exif.mjs",
+    "photos:sync-exif": "npm run photos:sync",
+    "prebuild": "npm run photos:sync",
     "build": "astro build && cp _redirects dist/",
     "preview": "astro preview",
     "astro": "astro"
