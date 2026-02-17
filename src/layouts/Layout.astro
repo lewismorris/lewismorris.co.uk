@@ -35,5 +35,23 @@ const { title } = Astro.props;
   <body>
     <Lightbox />
     <slot />
+
+    <script>
+      function initLqip() {
+        document.querySelectorAll<HTMLImageElement>('[data-lqip-img]').forEach((img) => {
+          const fadeIn = () => {
+            const wrapper = img.closest('.relative');
+            if (wrapper) {
+              wrapper.querySelector('[data-lqip-bg]')?.classList.add('loaded');
+              img.classList.add('opacity-100');
+            }
+          };
+          if (img.complete) fadeIn();
+          else img.addEventListener('load', fadeIn);
+        });
+      }
+      document.addEventListener('astro:page-load', initLqip);
+      initLqip();
+    </script>
   </body>
 </html>

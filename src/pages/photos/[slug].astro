@@ -185,18 +185,4 @@ function getDimensions(image: PhotoImage): { width: number; height: number } {
       </div>
     </div>
   </main>
-
-  <script>
-    document.querySelectorAll<HTMLImageElement>('[data-lqip-img]').forEach((img) => {
-      const fadeIn = () => {
-        const wrapper = img.closest('.relative');
-        if (wrapper) {
-          wrapper.querySelector('[data-lqip-bg]')?.classList.add('loaded');
-          img.classList.add('opacity-100');
-        }
-      };
-      if (img.complete) fadeIn();
-      else img.addEventListener('load', fadeIn);
-    });
-  </script>
 </Layout>
