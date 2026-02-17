@@ -5,7 +5,11 @@ import { sanityClient } from 'sanity:client';
 import { urlForImage } from '../../sanity/lib/url-for-image';
 
 interface PhotoImage {
-  asset?: { _id?: string; url?: string; metadata?: { dimensions?: { width: number; height: number } } };
+  asset?: {
+    _id?: string;
+    url?: string;
+    metadata?: { dimensions?: { width: number; height: number }; lqip?: string };
+  };
   alt?: string;
   hotspot?: unknown;
   crop?: unknown;
@@ -34,7 +38,7 @@ const items = await sanityClient.fetch<
       _type == "photo" => image,
       _type == "album" => coalesce(featuredImage->image, photos[0]->image)
     ) {
-      asset->{ _id, url, metadata { dimensions { width, height } } },
+      asset->{ _id, url, metadata { dimensions { width, height }, lqip } },
       alt,
       hotspot,
       crop
@@ -118,4 +122,18 @@ function getDimensions(image: PhotoImage): { width: number; height: number } {
       </div>
     </div>
   </main>
+
+  <script>
+    document.querySelectorAll<HTMLImageElement>('[data-lqip-img]').forEach((img) => {
+      const fadeIn = () => {
+        const wrapper = img.closest('.relative');
+        if (wrapper) {
+          wrapper.querySelector('[data-lqip-bg]')?.classList.add('loaded');
+          img.classList.add('opacity-100');
+        }
+      };
+      if (img.complete) fadeIn();
+      else img.addEventListener('load', fadeIn);
+    });
+  </script>
 </Layout>

@@ -3,7 +3,9 @@ import type { SanityImageSource } from '@sanity/image-url';
 import { buildImageSrcset, urlForImage } from '../sanity/lib/url-for-image';
 
 interface Props {
-  image: SanityImageSource;
+  image: SanityImageSource & {
+    asset?: { metadata?: { lqip?: string } };
+  };
   alt: string;
   title: string;
   href?: string;
@@ -17,20 +19,45 @@ const { image, alt, title, href, lightboxSrc, width, height, class: className } 
 
 const src = urlForImage(image).width(800).fit('max').auto('format').url();
 const srcset = buildImageSrcset(image, 1600);
+const lqip = image?.asset?.metadata?.lqip;
 ---
 
 {href ? (
-  <a href={href} class={`block ${className || ''}`}>
-    <img
-      src={src}
-      srcset={srcset}
-      width={width}
-      height={height}
-      alt={alt}
-      loading="lazy"
-      decoding="async"
-      class="w-full object-cover transition-all duration-300"
-    />
+  <a href={href} class={`block overflow-hidden ${className || ''}`}>
+    {lqip ? (
+      <div
+        class="relative w-full bg-neutral-200 dark:bg-neutral-700"
+        style={`aspect-ratio: ${width} / ${height}`}
+      >
+        <div
+          class="absolute inset-0 bg-cover bg-center scale-105 blur-xl [transition:filter_0.3s_ease-out] [&.loaded]:blur-none [&.loaded]:scale-100"
+          style={`background-image: url(${lqip})`}
+          data-lqip-bg
+        />
+        <img
+          src={src}
+          srcset={srcset}
+          width={width}
+          height={height}
+          alt={alt}
+          loading="lazy"
+          decoding="async"
+          class="relative w-full h-full object-cover transition-opacity duration-300 opacity-0"
+          data-lqip-img
+        />
+      </div>
+    ) : (
+      <img
+        src={src}
+        srcset={srcset}
+        width={width}
+        height={height}
+        alt={alt}
+        loading="lazy"
+        decoding="async"
+        class="w-full object-cover transition-all duration-300"
+      />
+    )}
   </a>
 ) : (
   <button
@@ -38,17 +65,41 @@ const srcset = buildImageSrcset(image, 1600);
     data-lightbox
     data-src={lightboxSrc}
     data-alt={alt}
-    class={`block w-full text-left group ${className || ''}`}
+    class={`block w-full text-left group overflow-hidden ${className || ''}`}
   >
-    <img
-      src={src}
-      srcset={srcset}
-      width={width}
-      height={height}
-      alt={alt}
-      loading="lazy"
-      decoding="async"
-      class="w-full object-cover cursor-zoom-in transition-all duration-300 group-hover:brightness-90"
-    />
+    {lqip ? (
+      <div
+        class="relative w-full bg-neutral-200 dark:bg-neutral-700"
+        style={`aspect-ratio: ${width} / ${height}`}
+      >
+        <div
+          class="absolute inset-0 bg-cover bg-center scale-105 blur-xl [transition:filter_0.3s_ease-out] [&.loaded]:blur-none [&.loaded]:scale-100"
+          style={`background-image: url(${lqip})`}
+          data-lqip-bg
+        />
+        <img
+          src={src}
+          srcset={srcset}
+          width={width}
+          height={height}
+          alt={alt}
+          loading="lazy"
+          decoding="async"
+          class="relative w-full h-full object-cover cursor-zoom-in transition-opacity duration-300 opacity-0 group-hover:brightness-90"
+          data-lqip-img
+        />
+      </div>
+    ) : (
+      <img
+        src={src}
+        srcset={srcset}
+        width={width}
+        height={height}
+        alt={alt}
+        loading="lazy"
+        decoding="async"
+        class="w-full object-cover cursor-zoom-in transition-all duration-300 group-hover:brightness-90"
+      />
+    )}
   </button>
 )}
