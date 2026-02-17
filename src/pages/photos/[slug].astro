@@ -1,0 +1,166 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import PhotoGridItem from '../../components/PhotoGridItem.astro';
+import { sanityClient } from 'sanity:client';
+import { urlForImage } from '../../sanity/lib/url-for-image';
+
+const { slug } = Astro.params;
+
+export async function getStaticPaths() {
+  const albums = await sanityClient.fetch<{ params: { slug: string } }[]>(
+    `*[_type == "album" && defined(slug.current)]{ "params": { "slug": slug.current } }`
+  );
+  return albums.map((a) => ({ params: a.params }));
+}
+
+interface PhotoImage {
+  asset?: { _id?: string; url?: string; metadata?: { dimensions?: { width: number; height: number } } };
+  alt?: string;
+  hotspot?: unknown;
+  crop?: unknown;
+}
+
+const album = await sanityClient.fetch<{
+  title: string;
+  featuredImage?: PhotoImage;
+  photoCount: number;
+  date?: string;
+  photos: { _id: string; title: string; alt: string; image: PhotoImage }[];
+}>(
+  `*[_type == "album" && slug.current == $slug][0]{
+    title,
+    "featuredImage": featuredImage->image {
+      asset->{ _id, url, metadata { dimensions { width, height } } },
+      alt,
+      hotspot,
+      crop
+    },
+    "photoCount": count(photos),
+    "date": photos[]->publishedAt | order(@ desc)[0],
+    "photos": photos[]->|order(publishedAt desc){
+      _id,
+      title,
+      alt,
+      "image": image {
+        asset->{ _id, url, metadata { dimensions { width, height } } },
+        alt,
+        hotspot,
+        crop
+      }
+    }
+  }`,
+  { slug }
+);
+
+import { format } from 'date-fns';
+
+if (!album) {
+  return Astro.redirect('/photos');
+}
+
+const displayImage = album.featuredImage || album.photos[0]?.image;
+const featuredSrc = displayImage
+  ? urlForImage(displayImage).width(1920).height(1080).fit('crop').url()
+  : null;
+
+function getDimensions(image: PhotoImage): { width: number; height: number } {
+  const dims = image?.asset?.metadata?.dimensions;
+  if (dims?.width && dims?.height) {
+    return { width: dims.width, height: dims.height };
+  }
+  return { width: 1600, height: 1200 };
+}
+---
+
+<Layout title={album.title}>
+  <main class="w-full">
+    <div class="px-6 md:px-12 pt-8 mb-8 max-w-5xl mx-auto">
+      <a
+        href="/photos"
+        class="text-neutral-500 hover:text-neutral-900 dark:hover:text-neutral-100 transition-colors mb-6 inline-flex items-center gap-2 text-sm font-medium"
+      >
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width="16"
+          height="16"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        >
+          <path d="M19 12H5"></path>
+          <path d="M12 19l-7-7 7-7"></path>
+        </svg>
+        Back to photos
+      </a>
+
+      {featuredSrc && (
+        <div class="relative w-full aspect-video md:aspect-[21/9] mb-8 rounded-lg overflow-hidden bg-neutral-100 dark:bg-neutral-800 shadow-sm">
+          <img
+            src={featuredSrc}
+            width={1920}
+            height={1080}
+            alt={album.title}
+            class="w-full h-full object-cover"
+          />
+          <div class="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent"></div>
+          <div class="absolute bottom-0 left-0 p-6 md:p-8 text-white">
+            <h1 class="text-3xl md:text-5xl font-bold mb-2 tracking-tight">
+              {album.title}
+            </h1>
+            <div class="flex items-center gap-4 text-sm md:text-base font-medium opacity-90">
+              <span>{album.photoCount} photos</span>
+              <span>•</span>
+              {album.date && (
+                <span>{format(new Date(album.date), 'MMMM yyyy')}</span>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {!featuredSrc && (
+        <div class="mb-12">
+          <h1 class="text-4xl font-bold mb-4 tracking-tight">{album.title}</h1>
+          <div class="flex items-center gap-4 text-neutral-600 dark:text-neutral-400">
+            <span>{album.photoCount} photos</span>
+            <span>•</span>
+            {album.date && (
+              <span>{format(new Date(album.date), 'MMMM yyyy')}</span>
+            )}
+          </div>
+        </div>
+      )}
+    </div>
+
+    <div class="overflow-hidden isolation-isolate">
+      <div class="columns-1 sm:columns-2 lg:columns-3 xl:columns-4 gap-0 space-y-0">
+        {album.photos
+          .filter((p) => p?.image)
+          .map((photo) => {
+            const { width, height } = getDimensions(photo.image);
+            const lightboxSrc = urlForImage(photo.image)
+              .width(2400)
+              .fit('max')
+              .auto('format')
+              .url();
+            return (
+              <div class="break-inside-avoid mb-0 group overflow-hidden relative hover:z-10">
+                <PhotoGridItem
+                  image={photo.image}
+                  alt={photo.alt}
+                  title={photo.title}
+                  lightboxSrc={lightboxSrc}
+                  width={width}
+                  height={height}
+                  class="transition-transform duration-500 group-hover:scale-105"
+                />
+              </div>
+            );
+          })}
+      </div>
+    </div>
+  </main>
+</Layout>

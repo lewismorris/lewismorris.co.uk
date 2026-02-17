@@ -4,7 +4,7 @@ This document helps AI agents understand the project structure, conventions, and
 
 ## Project Overview
 
-Personal website and blog for Lewis Morris. A static site with a homepage, writing/blog section, and placeholder for a photos section. Hosted at https://lewismorr.is.
+Personal website and blog for Lewis Morris. A static site with a homepage, writing/blog section, and photo gallery. Hosted at https://lewismorr.is.
 
 ## Tech Stack
 
@@ -33,8 +33,8 @@ lewismorris.co.uk/
 ├── src/
 │   ├── env.d.ts            # TypeScript / Astro type references
 │   ├── sanity/             # Sanity schema and lib
-│   │   ├── schemaTypes/    # blockContent, post
-│   │   └── lib/            # load-query, url-for-image
+│   │   ├── schemaTypes/    # album, blockContent, photo, post
+│   │   └── lib/            # load-query, url-for-image (with buildImageSrcset)
 │   ├── styles/
 │   │   └── global.css      # Global styles, Tailwind imports, base typography
 │   ├── layouts/
@@ -42,11 +42,16 @@ lewismorris.co.uk/
 │   │   ├── BlogLayout.astro # Blog post layout: title, date, Portable Text body
 │   │   └── MarkdownLayout.astro # Simple markdown layout with back link
 │   ├── components/
+│   │   ├── Lightbox.astro  # Native <dialog> lightbox for photo gallery
+│   │   ├── PhotoGridItem.astro # Masonry grid item (image, link, or lightbox trigger)
 │   │   ├── Prose.astro     # Typography wrapper using prose classes
 │   │   ├── PortableText.astro # Renders Sanity Portable Text
 │   │   └── portable-text/  # Custom marks (e.g. LinkMark)
 │   └── pages/
 │       ├── index.astro     # Homepage: bio, writing list, photos link
+│       ├── photos/
+│       │   ├── index.astro # All photos + album previews (masonry grid)
+│       │   └── [slug].astro # Album page: photos in order (masonry grid)
 │       └── writing/
 │           └── [slug].astro # Dynamic route: queries Sanity by slug
 ```
@@ -57,12 +62,13 @@ lewismorris.co.uk/
 - **Writing posts:** Sourced from Sanity CMS. Dynamic route `src/pages/writing/[slug].astro` queries `*[_type == "post" && slug.current == $slug][0]`.
 - **Post schema:** `title`, `slug`, `date`, `description`, `body` (Portable Text).
 - **Post listing:** Homepage queries `*[_type == "post" && defined(slug.current)] | order(date desc)`.
+- **Photos:** Sourced from Sanity. `/photos` shows all photos (newest first) and album previews. `/photos/[slug]` shows album contents. Schema: `photo` (title, image, alt, publishedAt), `album` (title, slug, optional featuredImage, photos array).
 - **Sanity Studio:** Run `npx sanity dev` to edit content locally. Manage at [sanity.io/manage](https://sanity.io/manage). Project: `ib5naxjq`, dataset: `production`.
 - **Redirects:** `/blog/*` redirects to `/writing/*` via `_redirects` (Netlify-style).
 
 ## Layout Hierarchy
 
-1. **Layout.astro** — Root shell: `<html>`, `<head>`, `<body>`, `ClientRouter`, meta, favicons.
+1. **Layout.astro** — Root shell: `<html>`, `<head>`, `<body>`, `ClientRouter`, `Lightbox`, meta, favicons.
 2. **BlogLayout.astro** — Wraps `Layout`, adds article header (title, formatted date), `PortableText` for body.
 3. **MarkdownLayout.astro** — Wraps `Layout`, adds back link, `Prose` for content.
 
@@ -97,4 +103,4 @@ lewismorris.co.uk/
 4. **Styling:** Prefer Tailwind utility classes; use `Prose.astro` for markdown-derived content.
 5. **Formatting:** Prettier with 2-space tabs, 80 char print width; use `prettier-plugin-astro` for `.astro` files.
 6. **Site URL:** Configured as `https://lewismorr.is` in `astro.config.mjs`; update there if the domain changes.
-7. **Photos section:** Index links to `/photos`; corresponding pages/content were removed in recent changes. Re‑adding photos would require new routes and content structure.
+7. **Photos:** Create `photo` and `album` documents in Sanity Studio. Photos: `title`, `image` (with hotspot), `alt`, `publishedAt`. Albums: `title`, `slug`, optional `featuredImage`, `photos` (min 1). Album preview on `/photos` uses `featuredImage` or first photo.

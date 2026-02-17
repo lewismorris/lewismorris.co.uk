@@ -1,0 +1,54 @@
+---
+import type { SanityImageSource } from '@sanity/image-url';
+import { buildImageSrcset, urlForImage } from '../sanity/lib/url-for-image';
+
+interface Props {
+  image: SanityImageSource;
+  alt: string;
+  title: string;
+  href?: string;
+  lightboxSrc: string;
+  width: number;
+  height: number;
+  class?: string;
+}
+
+const { image, alt, title, href, lightboxSrc, width, height, class: className } = Astro.props;
+
+const src = urlForImage(image).width(800).fit('max').auto('format').url();
+const srcset = buildImageSrcset(image, 1600);
+---
+
+{href ? (
+  <a href={href} class={`block ${className || ''}`}>
+    <img
+      src={src}
+      srcset={srcset}
+      width={width}
+      height={height}
+      alt={alt}
+      loading="lazy"
+      decoding="async"
+      class="w-full object-cover transition-all duration-300"
+    />
+  </a>
+) : (
+  <button
+    type="button"
+    data-lightbox
+    data-src={lightboxSrc}
+    data-alt={alt}
+    class={`block w-full text-left group ${className || ''}`}
+  >
+    <img
+      src={src}
+      srcset={srcset}
+      width={width}
+      height={height}
+      alt={alt}
+      loading="lazy"
+      decoding="async"
+      class="w-full object-cover cursor-zoom-in transition-all duration-300 group-hover:brightness-90"
+    />
+  </button>
+)}

@@ -1,0 +1,121 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import PhotoGridItem from '../../components/PhotoGridItem.astro';
+import { sanityClient } from 'sanity:client';
+import { urlForImage } from '../../sanity/lib/url-for-image';
+
+interface PhotoImage {
+  asset?: { _id?: string; url?: string; metadata?: { dimensions?: { width: number; height: number } } };
+  alt?: string;
+  hotspot?: unknown;
+  crop?: unknown;
+}
+
+const items = await sanityClient.fetch<
+  {
+    _type: 'photo' | 'album';
+    _id: string;
+    title: string;
+    slug?: string;
+    photoCount?: number;
+    date: string;
+    alt?: string;
+    image: PhotoImage;
+  }[]
+>(
+  `*[_type == "photo" && count(*[_type == "album" && references(^._id)]) == 0 || (_type == "album" && count(photos) > 0)] {
+    _type,
+    _id,
+    title,
+    "slug": slug.current,
+    "date": coalesce(publishedAt, photos[]->publishedAt | order(@ desc)[0], _createdAt),
+    "photoCount": count(photos),
+    "image": select(
+      _type == "photo" => image,
+      _type == "album" => coalesce(featuredImage->image, photos[0]->image)
+    ) {
+      asset->{ _id, url, metadata { dimensions { width, height } } },
+      alt,
+      hotspot,
+      crop
+    },
+    alt
+  } | order(date desc)`
+);
+
+function getDimensions(image: PhotoImage): { width: number; height: number } {
+  const dims = image?.asset?.metadata?.dimensions;
+  if (dims?.width && dims?.height) {
+    return { width: dims.width, height: dims.height };
+  }
+  return { width: 1600, height: 1200 };
+}
+---
+
+<Layout title="Photos">
+  <main class="w-full">
+    <div class="mx-auto max-w-2xl mb-12">
+      <h1 class="text-4xl font-bold tracking-tight">Photos</h1>
+    </div>
+
+    <div class="overflow-hidden isolation-isolate">
+      <div class="columns-1 sm:columns-2 lg:columns-3 xl:columns-4 gap-0 space-y-0">
+        {items.map((item) => {
+          if (!item.image) return null;
+          const { width, height } = getDimensions(item.image);
+          const lightboxSrc = urlForImage(item.image)
+            .width(2400)
+            .fit('max')
+            .auto('format')
+            .url();
+
+          if (item._type === 'album') {
+            return (
+              <div class="break-inside-avoid mb-0 relative group overflow-hidden">
+                <a href={`/photos/${item.slug}`} class="block relative group-hover:z-10">
+                  <img
+                    src={urlForImage(item.image)
+                      .width(800)
+                      .fit('max')
+                      .auto('format')
+                      .url()}
+                    width={width}
+                    height={height}
+                    alt={item.title}
+                    class="w-full h-auto object-cover transition-all duration-500 group-hover:scale-105 group-hover:brightness-110"
+                    loading="lazy"
+                  />
+                  
+                  {/* Album Overlay */}
+                  <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-90 transition-opacity"></div>
+                  
+                  <div class="absolute bottom-0 left-0 p-6 text-white w-full">
+                    <div class="flex items-center gap-2 mb-2 text-xs font-bold tracking-wider uppercase opacity-80">
+                      Album
+                    </div>
+                    <h2 class="text-2xl font-bold leading-tight mb-1">{item.title}</h2>
+                    <p class="text-sm opacity-90">{item.photoCount} photos</p>
+                  </div>
+                </a>
+              </div>
+            );
+          }
+
+          return (
+            <div class="break-inside-avoid mb-0 group overflow-hidden relative hover:z-10">
+              <PhotoGridItem
+                image={item.image}
+                alt={item.alt || item.title}
+                title={item.title}
+                lightboxSrc={lightboxSrc}
+                width={width}
+                height={height}
+                class="transition-transform duration-500 group-hover:scale-105"
+              />
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  </main>
+</Layout>

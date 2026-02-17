@@ -1,0 +1,197 @@
+---
+---
+
+<dialog id="photo-lightbox" closedby="any" class="fixed inset-0 w-full h-full max-w-none max-h-none p-0 m-0 bg-neutral-950/95 border-0 backdrop:bg-transparent transition-opacity duration-300 opacity-0 z-50">
+  <div class="lightbox-inner relative flex items-center justify-center w-full h-full p-4">
+    <button
+      type="button"
+      class="lightbox-close absolute top-4 right-4 z-20 p-2 text-neutral-400 hover:text-white transition-colors cursor-pointer rounded-full hover:bg-white/10"
+      aria-label="Close"
+    >
+      <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+    </button>
+    
+    <figure class="lightbox-figure flex flex-col max-w-full max-h-full bg-black shadow-2xl opacity-0 transition-opacity duration-200 pointer-events-auto">
+      <img
+        src=""
+        alt=""
+        class="lightbox-image block w-auto h-auto max-w-full max-h-[85vh] object-contain min-w-[320px]"
+      />
+      <figcaption class="lightbox-caption w-full bg-black p-1 text-center text-neutral-300 font-serif text-sm empty:hidden"></figcaption>
+    </figure>
+
+    <button
+      type="button"
+      class="lightbox-prev absolute left-4 top-1/2 -translate-y-1/2 z-10 p-3 text-neutral-400 hover:text-white transition-colors cursor-pointer disabled:opacity-30 disabled:cursor-not-allowed rounded-full hover:bg-white/10"
+      aria-label="Previous"
+    >
+      <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
+    </button>
+    <button
+      type="button"
+      class="lightbox-next absolute right-4 top-1/2 -translate-y-1/2 z-10 p-3 text-neutral-400 hover:text-white transition-colors cursor-pointer disabled:opacity-30 disabled:cursor-not-allowed rounded-full hover:bg-white/10"
+      aria-label="Next"
+    >
+      <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
+    </button>
+  </div>
+</dialog>
+
+<script>
+  let items: { src: string; alt: string }[] = [];
+  let currentIndex = 0;
+
+  function getDialog(): HTMLDialogElement | null {
+    const el = document.getElementById('photo-lightbox');
+    return el instanceof HTMLDialogElement ? el : null;
+  }
+
+  function updateImage() {
+    const dialog = getDialog();
+    if (!dialog) return;
+    const figure = dialog.querySelector<HTMLElement>('.lightbox-figure');
+    const img = dialog.querySelector<HTMLImageElement>('.lightbox-image');
+    const caption = dialog.querySelector<HTMLElement>('.lightbox-caption');
+    const prevBtn = dialog.querySelector<HTMLButtonElement>('.lightbox-prev');
+    const nextBtn = dialog.querySelector<HTMLButtonElement>('.lightbox-next');
+    const item = items[currentIndex];
+    
+    if (!item || !img || !figure) return;
+    
+    // Fade out
+    figure.style.opacity = '0';
+    
+    setTimeout(() => {
+      img.src = item.src;
+      img.alt = item.alt;
+      if (caption) caption.textContent = item.alt;
+      
+      // Update buttons state
+      if (prevBtn) {
+        prevBtn.disabled = currentIndex === 0;
+        prevBtn.setAttribute('aria-disabled', currentIndex === 0 ? 'true' : 'false');
+      }
+      if (nextBtn) {
+        nextBtn.disabled = currentIndex === items.length - 1;
+        nextBtn.setAttribute('aria-disabled', currentIndex === items.length - 1 ? 'true' : 'false');
+      }
+
+      // Fade in
+      requestAnimationFrame(() => {
+        img.onload = () => {
+          figure.style.opacity = '1';
+        };
+        // Handle cached images that don't trigger onload
+        if (img.complete) {
+          figure.style.opacity = '1';
+        }
+      });
+    }, 200);
+  }
+
+  function open(index: number) {
+    const dialog = getDialog();
+    if (!dialog) return;
+    items = Array.from(document.querySelectorAll<HTMLElement>('[data-lightbox]')).map((el) => ({
+      src: el.dataset.src ?? '',
+      alt: el.dataset.alt ?? '',
+    }));
+    if (items.length === 0) return;
+    currentIndex = Math.min(Math.max(0, index), items.length - 1);
+    
+    // Reset image state before showing
+    const figure = dialog.querySelector<HTMLElement>('.lightbox-figure');
+    if (figure) figure.style.opacity = '0';
+    
+    updateImage();
+    dialog.showModal();
+    // Use a small timeout to allow display:block to apply before adding opacity class
+    requestAnimationFrame(() => {
+       dialog.classList.add('opacity-100');
+    });
+    
+    dialog.querySelector<HTMLButtonElement>('.lightbox-close')?.focus();
+  }
+
+  function close() {
+    const dialog = getDialog();
+    if (!dialog) return;
+    
+    dialog.classList.remove('opacity-100');
+    
+    // Wait for transition to finish before closing
+    setTimeout(() => {
+      dialog.close();
+    }, 300);
+  }
+
+  function goPrev() {
+    if (currentIndex > 0) {
+      currentIndex--;
+      updateImage();
+    }
+  }
+
+  function goNext() {
+    if (currentIndex < items.length - 1) {
+      currentIndex++;
+      updateImage();
+    }
+  }
+
+  function initLightbox() {
+    const dialog = getDialog();
+    if (!dialog || dialog.hasAttribute('data-lightbox-initialized')) return;
+    dialog.setAttribute('data-lightbox-initialized', '');
+
+    const closeBtn = dialog.querySelector<HTMLButtonElement>('.lightbox-close');
+    const prevBtn = dialog.querySelector<HTMLButtonElement>('.lightbox-prev');
+    const nextBtn = dialog.querySelector<HTMLButtonElement>('.lightbox-next');
+
+    closeBtn?.addEventListener('click', close);
+    prevBtn?.addEventListener('click', goPrev);
+    nextBtn?.addEventListener('click', goNext);
+
+    dialog.addEventListener('click', (e) => {
+      const target = e.target as HTMLElement;
+      if (
+        target === dialog ||
+        (target.closest('.lightbox-inner') && !target.closest('.lightbox-figure'))
+      ) {
+        close();
+      }
+    });
+
+    dialog.addEventListener('keydown', (e) => {
+      if (!dialog.open) return;
+      if (e.key === 'ArrowLeft') {
+        e.preventDefault();
+        goPrev();
+      } else if (e.key === 'ArrowRight') {
+        e.preventDefault();
+        goNext();
+      } else if (e.key === 'Escape') {
+        e.preventDefault();
+        close();
+      }
+    });
+  }
+
+  document.addEventListener('click', (e) => {
+    const trigger = (e.target as HTMLElement).closest<HTMLElement>('[data-lightbox]');
+    if (trigger) {
+      e.preventDefault();
+      const idx = Array.from(document.querySelectorAll('[data-lightbox]')).indexOf(trigger);
+      open(idx);
+    }
+  });
+
+  document.addEventListener('astro:page-load', initLightbox);
+  initLightbox();
+</script>
+
+<style>
+  #photo-lightbox::backdrop {
+    background: transparent; /* Handled by container bg for transition support */
+  }
+</style>
