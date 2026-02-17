@@ -1,0 +1,17 @@
+---
+description: Update AGENTS.md when making major changes that affect project structure, tech stack, or conventions
+alwaysApply: true
+---
+
+# Keep AGENTS.md Up to Date
+
+When making major changes that affect any of the following, update `AGENTS.md` in the same session:
+
+- **Tech stack**: Adding, removing, or upgrading dependencies
+- **Project structure**: New directories, layout hierarchy, or significant file moves
+- **Routing/content**: New content types, routing patterns, or frontmatter conventions
+- **Styling**: Tailwind config changes, new design tokens, or styling approach
+- **Scripts**: New or changed npm scripts
+- **Build/deploy**: Config changes (e.g. Astro, redirects, hosting)
+
+Apply the same conventions used in `AGENTS.md`: concise tables, bullet lists, and clear section headings. Do not leave the project with outdated documentation.
