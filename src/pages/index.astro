@@ -1,12 +1,18 @@
 ---
 import Layout from "../layouts/Layout.astro";
+import { sanityClient } from 'sanity:client';
 import { differenceInYears } from 'date-fns';
-const posts = await Astro.glob('./writing/*.md');
-const sortedPosts = posts.sort((a, b) => {
-  const dateA = new Date(a.frontmatter.date);
-  const dateB = new Date(b.frontmatter.date);
-  return dateB.getTime() - dateA.getTime();
-});
+
+const posts = await sanityClient.fetch<
+  { _id: string; title: string; slug: { current: string }; date: string }[]
+>(
+  `*[_type == "post" && defined(slug.current)] | order(date desc) {
+    _id,
+    title,
+    slug,
+    date
+  }`,
+);
 ---
 
 <Layout>
@@ -24,13 +30,11 @@ const sortedPosts = posts.sort((a, b) => {
     <section class="space-y-4">
       <h2 class="text-3xl font-medium">Writing</h2>
       <ul class="list-disc list-inside">
-        {sortedPosts.map((post) => {
-          return (
-            <li>
-              <a href={post.url}>{post.frontmatter.title}</a>
-            </li>
-          );
-        })}
+        {posts.map((post) => (
+          <li>
+            <a href={`/writing/${post.slug.current}`}>{post.title}</a>
+          </li>
+        ))}
       </ul>
     </section>
 

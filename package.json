@@ -10,11 +10,22 @@
     "astro": "astro"
   },
   "dependencies": {
+    "@astrojs/netlify": "^6.6.4",
+    "@astrojs/react": "^4.4.2",
     "@astrojs/sitemap": "3.7.0",
+    "@portabletext/block-tools": "^5.0.1",
+    "@portabletext/types": "^4.0.1",
+    "@sanity/astro": "^3.2.11",
+    "@sanity/image-url": "^2.0.3",
     "@tailwindcss/vite": "4.1.18",
     "astro": "5.17.2",
+    "astro-portabletext": "^0.13.0",
     "date-fns": "4.1.0",
     "groq": "5.10.0",
+    "jsdom": "^28.1.0",
+    "marked": "^17.0.3",
+    "react": "^19.2.4",
+    "react-dom": "^19.2.4",
     "tailwindcss": "4.1.18"
   },
   "devDependencies": {

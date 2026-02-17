@@ -1,0 +1,39 @@
+---
+import { sanityClient } from 'sanity:client';
+import BlogLayout from '../../layouts/BlogLayout.astro';
+
+const { slug } = Astro.params;
+
+export async function getStaticPaths() {
+  const posts = await sanityClient.fetch<{ slug: { current: string } }[]>(
+    `*[_type == "post" && defined(slug.current)]{ "params": { "slug": slug.current } }`,
+  );
+  return posts.map((p) => ({ params: p.params }));
+}
+
+const post = await sanityClient.fetch<{
+  title: string;
+  date: string;
+  description?: string;
+  body?: unknown[];
+}>(
+  `*[_type == "post" && slug.current == $slug][0]{
+    title,
+    date,
+    description,
+    body
+  }`,
+  { slug },
+);
+
+if (!post) {
+  return Astro.redirect('/');
+}
+---
+
+<BlogLayout
+  title={post.title}
+  date={post.date}
+  description={post.description}
+  body={post.body}
+/>

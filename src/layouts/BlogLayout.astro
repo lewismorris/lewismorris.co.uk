@@ -1,30 +1,27 @@
 ---
 import Layout from "./Layout.astro";
-import Prose from "../components/Prose.astro";
+import PortableText from "../components/PortableText.astro";
 import { format } from 'date-fns';
 
 interface Props {
-  frontmatter: {
-    title: string;
-    date: string;
-    description?: string;
-  };
+  title: string;
+  date: string;
+  description?: string;
+  body?: unknown[] | null;
 }
 
-const { frontmatter } = Astro.props;
+const { title, date, body } = Astro.props;
 ---
 
-<Layout title={frontmatter.title}>
+<Layout title={title}>
   <main class="w-full max-w-2xl mx-auto">
     <article class="space-y-4">
       <header>
-        <h1 class="text-3xl font-medium">{frontmatter.title}</h1>
-        <time datetime={format(new Date(frontmatter.date), 'yyyy-MM-dd')}>{format(new Date(frontmatter.date), 'do MMMM yyyy')}</time>
+        <h1 class="text-3xl font-medium">{title}</h1>
+        <time datetime={format(new Date(date), 'yyyy-MM-dd')}>{format(new Date(date), 'do MMMM yyyy')}</time>
       </header>
       <hr class="w-full border-neutral-200 dark:border-neutral-800" />
-      <Prose>
-        <slot />
-      </Prose>
+      {body && body.length > 0 && <PortableText value={body} />}
     </article>
   </main>
 </Layout>

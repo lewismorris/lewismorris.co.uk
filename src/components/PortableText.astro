@@ -1,0 +1,23 @@
+---
+import { PortableText as PortableTextInternal } from 'astro-portabletext';
+import Prose from './Prose.astro';
+import LinkMark from './portable-text/LinkMark.astro';
+
+interface Props {
+  value: unknown[] | null | undefined;
+}
+
+const { value } = Astro.props;
+
+const components = {
+  marks: {
+    link: LinkMark,
+  },
+};
+
+const blocks = Array.isArray(value) ? value : value ? [value] : [];
+---
+
+<Prose>
+  {blocks.length > 0 && <PortableTextInternal value={blocks} components={components} />}
+</Prose>

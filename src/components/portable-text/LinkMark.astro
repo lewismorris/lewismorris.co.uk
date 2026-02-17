@@ -1,0 +1,18 @@
+---
+interface Props {
+  node: { markDef?: { href?: string } };
+}
+
+const { node } = Astro.props;
+const href = node?.markDef?.href ?? '#';
+const isExternal = href.startsWith('http');
+---
+
+<a
+  href={href}
+  rel={isExternal ? 'noreferrer noopener' : undefined}
+  target={isExternal ? '_blank' : undefined}
+  class="underline hover:no-underline"
+>
+  <slot />
+</a>
